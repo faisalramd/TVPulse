@@ -38,6 +38,9 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
+    implementation(project(":features"))
+
     // AndroidX
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
@@ -49,21 +52,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
     // Network
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.logging)
-
-    // Room
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    ksp(libs.room.compiler)
-
-    // DataStore
-    implementation(libs.datastore.preferences)
-
-    // UI Tools (Coil & Lottie)
-    implementation(libs.coil.compose)
-    implementation(libs.lottie.compose)
 
     // Test
     testImplementation(libs.junit)
@@ -78,6 +67,5 @@ dependencies {
 
     // Dependency Injection
     implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
 }

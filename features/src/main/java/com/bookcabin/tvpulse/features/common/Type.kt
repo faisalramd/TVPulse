@@ -1,4 +1,4 @@
-package com.bookcabin.tvpulse.ui.theme
+package com.bookcabin.tvpulse.features.common
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

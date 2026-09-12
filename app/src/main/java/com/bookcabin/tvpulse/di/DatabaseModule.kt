@@ -2,9 +2,9 @@ package com.bookcabin.tvpulse.di
 
 import android.content.Context
 import androidx.room.Room
-import com.bookcabin.tvpulse.data.local.AppDatabase
-import com.bookcabin.tvpulse.data.local.SettingsDataStore
-import com.bookcabin.tvpulse.data.local.ShowDao
+import com.bookcabin.tvpulse.core.common.AppDatabase
+import com.bookcabin.tvpulse.core.common.SettingsDataStore
+import com.bookcabin.tvpulse.core.home.data.source.HomeDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,13 +27,13 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideShowDao(database: AppDatabase): ShowDao {
-        return database.showDao()
+    fun provideHomeDao(database: AppDatabase): HomeDao {
+        return database.homeDao()
     }
 
     @Provides
     @Singleton
-    fun provideFAvoDataStore(@ApplicationContext context: Context): SettingsDataStore {
+    fun provideSettingsDataStore(@ApplicationContext context: Context): SettingsDataStore {
         return SettingsDataStore(context)
     }
 }

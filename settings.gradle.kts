@@ -24,4 +24,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "TVPulse"
 include(":app")
+include(":core")
+include(":features")
  

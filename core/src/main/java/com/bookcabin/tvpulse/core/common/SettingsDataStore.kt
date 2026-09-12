@@ -1,4 +1,4 @@
-package com.bookcabin.tvpulse.data.local
+package com.bookcabin.tvpulse.core.common
 
 import android.content.Context
 import androidx.datastore.core.DataStore
