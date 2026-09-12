@@ -1,4 +1,4 @@
-package com.bookcabin.tvpulse.core.home.data.model
+package com.bookcabin.tvpulse.core.show.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

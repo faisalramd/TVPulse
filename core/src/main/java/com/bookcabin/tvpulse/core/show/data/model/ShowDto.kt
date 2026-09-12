@@ -1,4 +1,4 @@
-package com.bookcabin.tvpulse.core.home.data.model
+package com.bookcabin.tvpulse.core.show.data.model
 
 data class ShowDto(
     val id: Int,

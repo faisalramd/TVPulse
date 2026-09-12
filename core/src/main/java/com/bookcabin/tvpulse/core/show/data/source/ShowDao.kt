@@ -1,14 +1,14 @@
-package com.bookcabin.tvpulse.core.home.data.source
+package com.bookcabin.tvpulse.core.show.data.source
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.bookcabin.tvpulse.core.home.data.model.ShowEntity
+import com.bookcabin.tvpulse.core.show.data.model.ShowEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface HomeDao {
+interface ShowDao {
     @Query("SELECT * FROM shows")
     fun getAllShows(): Flow<List<ShowEntity>>
 

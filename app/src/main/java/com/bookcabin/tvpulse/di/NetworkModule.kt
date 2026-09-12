@@ -1,6 +1,6 @@
 package com.bookcabin.tvpulse.di
 
-import com.bookcabin.tvpulse.core.home.data.source.HomeApi
+import com.bookcabin.tvpulse.core.show.data.source.ShowApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,7 +38,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHomeApi(retrofit: Retrofit): HomeApi {
-        return retrofit.create(HomeApi::class.java)
+    fun provideHomeApi(retrofit: Retrofit): ShowApi {
+        return retrofit.create(ShowApi::class.java)
     }
 }

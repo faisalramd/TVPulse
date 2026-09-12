@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.bookcabin.tvpulse.core.common.AppDatabase
 import com.bookcabin.tvpulse.core.common.SettingsDataStore
-import com.bookcabin.tvpulse.core.home.data.source.HomeDao
+import com.bookcabin.tvpulse.core.show.data.source.ShowDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,7 +27,7 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideHomeDao(database: AppDatabase): HomeDao {
+    fun provideHomeDao(database: AppDatabase): ShowDao {
         return database.homeDao()
     }
 

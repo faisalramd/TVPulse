@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bookcabin.tvpulse.core.common.SettingsDataStore
-import com.bookcabin.tvpulse.core.home.domain.usecase.GetLocalShowsUseCase
-import com.bookcabin.tvpulse.core.home.domain.usecase.RefreshShowsUseCase
+import com.bookcabin.tvpulse.core.show.domain.usecase.GetLocalShowsUseCase
+import com.bookcabin.tvpulse.core.show.domain.usecase.RefreshShowsUseCase
 import com.bookcabin.tvpulse.features.home.presentation.state.HomeIntent
 import com.bookcabin.tvpulse.features.home.presentation.state.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
