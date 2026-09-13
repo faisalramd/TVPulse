@@ -5,17 +5,22 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.util.Consumer
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -31,6 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -50,32 +56,44 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     topBar = {
-                        // Tabs are only shown on top-level destinations, not on screens like Detail.
+                        // The app bar and tabs are only shown on top-level destinations, not on screens like Detail.
                         if (selectedIndex == null) return@Scaffold
-                        PrimaryTabRow(
-                            selectedTabIndex = selectedIndex,
-                            modifier = Modifier.statusBarsPadding(),
-                        ) {
-                            routes.forEachIndexed { index, topLevelRoute ->
-                                Tab(
-                                    selected = selectedIndex == index,
-                                    onClick = {
-                                        navController.navigate(topLevelRoute.route) {
-                                            popUpTo(navController.graph.findStartDestination().id) {
-                                                saveState = true
-                                            }
-                                            launchSingleTop = true
-                                            restoreState = true
-                                        }
-                                    },
-                                    text = {
-                                        Text(
-                                            text = topLevelRoute.label,
-                                            style = MaterialTheme.typography.titleSmall,
-                                            modifier = Modifier.padding(vertical = 4.dp)
-                                        )
-                                    }
+                        Column {
+                            TopAppBar(
+                                title = {
+                                    Text(
+                                        text = stringResource(R.string.app_name),
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                },
+                                colors = TopAppBarDefaults.topAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
+                            )
+                            PrimaryTabRow(selectedTabIndex = selectedIndex) {
+                                routes.forEachIndexed { index, topLevelRoute ->
+                                    Tab(
+                                        selected = selectedIndex == index,
+                                        onClick = {
+                                            navController.navigate(topLevelRoute.route) {
+                                                popUpTo(navController.graph.findStartDestination().id) {
+                                                    saveState = true
+                                                }
+                                                launchSingleTop = true
+                                                restoreState = true
+                                            }
+                                        },
+                                        text = {
+                                            Text(
+                                                text = topLevelRoute.label.uppercase(),
+                                                style = MaterialTheme.typography.titleSmall,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.padding(vertical = 4.dp)
+                                            )
+                                        }
+                                    )
+                                }
                             }
                         }
                     }

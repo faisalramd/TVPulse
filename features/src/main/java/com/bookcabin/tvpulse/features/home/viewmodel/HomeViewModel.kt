@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.bookcabin.tvpulse.core.show.domain.usecase.GetLocalShowsUseCase
 import com.bookcabin.tvpulse.core.show.domain.usecase.RefreshShowsUseCase
 import com.bookcabin.tvpulse.core.show.domain.usecase.SearchShowsUseCase
+import com.bookcabin.tvpulse.features.home.constant.HomeConstants
 import com.bookcabin.tvpulse.features.home.state.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -44,7 +45,7 @@ class HomeViewModel @Inject constructor(
     init {
         refreshShows()
         query
-            .debounce { if (it.isBlank()) 0L else SEARCH_DEBOUNCE_MS }
+            .debounce { if (it.isBlank()) 0L else HomeConstants.SEARCH_DEBOUNCE_MS }
             .onEach { search() }
             .launchIn(viewModelScope)
     }
@@ -85,7 +86,7 @@ class HomeViewModel @Inject constructor(
             isRefreshing.value = true
             refreshFailed.value = false
             try {
-                refreshShowsUseCase(30)
+                refreshShowsUseCase(HomeConstants.SHOW_ITEMS_LIMIT)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -126,9 +127,5 @@ class HomeViewModel @Inject constructor(
                 searchState.value = HomeUiState(loadFailed = true)
             }
         }
-    }
-
-    private companion object {
-        const val SEARCH_DEBOUNCE_MS = 1000L
     }
 }

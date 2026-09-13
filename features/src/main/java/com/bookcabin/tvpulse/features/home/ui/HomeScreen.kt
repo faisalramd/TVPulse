@@ -27,12 +27,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.bookcabin.tvpulse.core.show.domain.model.Show
 import com.bookcabin.tvpulse.features.common.components.EmptyState
 import com.bookcabin.tvpulse.features.common.components.ErrorDialog
+import com.bookcabin.tvpulse.features.home.constant.HomeConstants
 import com.bookcabin.tvpulse.features.home.state.HomeUiState
 import com.bookcabin.tvpulse.features.home.viewmodel.HomeViewModel
 
@@ -62,13 +64,14 @@ fun HomeScreen(
                 .padding(start = 16.dp, top = 16.dp, end = 16.dp)
         ) {
             Text(
-                text = "Daftar Acara Populer".uppercase(),
+                text = (if (uiState.query.isBlank()) "Daftar Acara Populer".uppercase() else "Daftar Utama"),
                 style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = "(30 Film)",
+                text = "(${HomeConstants.SHOW_ITEMS_LIMIT} Film)",
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
