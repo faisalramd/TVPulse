@@ -17,14 +17,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.bookcabin.tvpulse.core.show.domain.model.Show
+import com.bookcabin.tvpulse.features.common.components.ErrorDialog
 import com.bookcabin.tvpulse.features.home.state.HomeUiState
 import com.bookcabin.tvpulse.features.home.viewmodel.HomeViewModel
 
@@ -150,21 +149,6 @@ private fun ShowGridContent(
             }
         }
     }
-}
-
-@Composable
-private fun ErrorDialog(message: String, onRetry: () -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Terjadi kesalahan") },
-        text = { Text(message) },
-        confirmButton = {
-            TextButton(onClick = onRetry) { Text("Coba lagi") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Tutup") }
-        }
-    )
 }
 
 @Composable

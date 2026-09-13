@@ -2,9 +2,11 @@ package com.bookcabin.tvpulse.core.show.data.repository
 
 import com.bookcabin.tvpulse.core.show.data.mapper.toDomain
 import com.bookcabin.tvpulse.core.show.data.mapper.toEntity
+import com.bookcabin.tvpulse.core.show.data.mapper.toShowDetail
 import com.bookcabin.tvpulse.core.show.data.source.ShowApi
 import com.bookcabin.tvpulse.core.show.data.source.ShowDao
 import com.bookcabin.tvpulse.core.show.domain.model.Show
+import com.bookcabin.tvpulse.core.show.domain.model.ShowDetail
 import com.bookcabin.tvpulse.core.show.domain.repository.ShowRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -25,4 +27,7 @@ class ShowRepositoryImpl @Inject constructor(
 
     override suspend fun searchShows(query: String): List<Show> =
         showApi.searchShows(query).map { it.show.toDomain() }
+
+    override suspend fun getShowDetail(id: Int): ShowDetail =
+        showApi.getShowDetail(id).toShowDetail()
 }

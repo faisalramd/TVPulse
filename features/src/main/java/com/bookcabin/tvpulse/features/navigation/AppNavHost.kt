@@ -38,7 +38,10 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         }
         composable<Detail> {
             val viewModel: DetailViewModel = hiltViewModel()
-            DetailScreen(viewModel = viewModel)
+            DetailScreen(
+                viewModel = viewModel,
+                onBackClick = { navController.navigateUp() }
+            )
         }
     }
 }

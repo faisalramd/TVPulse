@@ -4,7 +4,12 @@ data class ShowDto(
     val id: Int,
     val name: String,
     val image: ImageDto?,
-    val rating: RatingDto?
+    val rating: RatingDto?,
+    val genres: List<String>?,
+    val runtime: Int?,
+    val averageRuntime: Int?,
+    val status: String?,
+    val summary: String?
 )
 
 data class ImageDto(

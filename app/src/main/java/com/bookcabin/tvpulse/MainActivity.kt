@@ -50,6 +50,8 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     topBar = {
+                        // Tabs are only shown on top-level destinations, not on screens like Detail.
+                        if (selectedIndex == null) return@Scaffold
                         PrimaryTabRow(
                             selectedTabIndex = selectedIndex,
                             modifier = Modifier.statusBarsPadding(),
@@ -85,12 +87,13 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun getSelectedIndex(navController: NavHostController): Int {
+    private fun getSelectedIndex(navController: NavHostController): Int? {
         val routes = AppDestinations.entries
         val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
-
         // fallback if destination isn't resolving properly yet on cold start
-        return routes.indexOfFirst { currentDestination?.hasRoute(it.route::class) == true }.takeIf { it >= 0 } ?: 0
+        val currentDestination = navBackStackEntry?.destination ?: return 0
+
+        // null when the current destination isn't a tab
+        return routes.indexOfFirst { currentDestination.hasRoute(it.route::class) }.takeIf { it >= 0 }
     }
 }
