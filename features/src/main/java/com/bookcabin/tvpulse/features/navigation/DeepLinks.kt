@@ -9,7 +9,10 @@ object DeepLinks {
 
     const val HOST_HOME = "home"
     const val HOST_FAVORITE = "favorite"
+    const val HOST_DETAIL = "detail"
 
     const val HOME = "$SCHEME://$HOST_HOME"
     const val FAVORITE = "$SCHEME://$HOST_FAVORITE"
+
+    const val DETAIL = "$SCHEME://$HOST_DETAIL"
 }

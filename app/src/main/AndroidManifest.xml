@@ -35,6 +35,7 @@
 
                 <data android:scheme="tvpulse" android:host="home" />
                 <data android:scheme="tvpulse" android:host="favorite" />
+                <data android:scheme="tvpulse" android:host="detail" />
             </intent-filter>
         </activity>
 
