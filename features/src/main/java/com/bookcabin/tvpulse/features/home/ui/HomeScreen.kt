@@ -137,13 +137,11 @@ private fun ShowGridContent(
     when {
         uiState.loadFailed -> EmptyState(message = stringResource(R.string.home_load_failed), onRetry = onRetry)
 
-        !uiState.isLoading && uiState.shows.isEmpty() -> EmptyState(
-            message = if (uiState.query.isBlank()) {
-                stringResource(R.string.home_empty)
-            } else {
-                stringResource(R.string.home_search_empty, uiState.query)
-            }
-        )
+        !uiState.isLoading && uiState.shows.isEmpty() -> if (uiState.query.isBlank()) {
+            EmptyState(message = stringResource(R.string.home_empty))
+        } else {
+            SearchNotFound(query = uiState.query)
+        }
 
         else -> LazyVerticalGrid(
             columns = GridCells.Fixed(2),

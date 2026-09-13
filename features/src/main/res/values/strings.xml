@@ -28,7 +28,8 @@
     <string name="home_search_clear">Hapus pencarian</string>
     <string name="home_load_failed">Gagal memuat data!</string>
     <string name="home_empty">Tidak ada data!</string>
-    <string name="home_search_empty">Pencarian tidak ditemukan untuk \"%1$s\".</string>
+    <string name="home_search_not_found_title">Pencarian Tidak Ditemukan</string>
+    <string name="home_search_not_found_message">Hups! Tidak ditemukan apa pun. Coba kata kunci lain atau periksa ejaan.</string>
     <string name="show_rating_unavailable">N/A</string>
 
     <!-- Detail -->
