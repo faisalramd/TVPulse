@@ -23,7 +23,7 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "tvpulse_db"
+            AppDatabase.DATABASE_NAME
         )
             .fallbackToDestructiveMigration(dropAllTables = true)
             .build()

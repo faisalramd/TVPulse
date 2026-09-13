@@ -11,4 +11,8 @@ import com.bookcabin.tvpulse.core.show.data.source.ShowDao
 abstract class AppDatabase : RoomDatabase() {
     abstract fun homeDao(): ShowDao
     abstract fun favoriteDao(): FavoriteDao
+
+    companion object {
+        const val DATABASE_NAME = "tvpulse_db"
+    }
 }

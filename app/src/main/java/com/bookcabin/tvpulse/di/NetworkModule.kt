@@ -1,5 +1,6 @@
 package com.bookcabin.tvpulse.di
 
+import com.bookcabin.tvpulse.BuildConfig
 import com.bookcabin.tvpulse.core.show.data.source.ShowApi
 import dagger.Module
 import dagger.Provides
@@ -19,7 +20,8 @@ object NetworkModule {
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            // Full request/response logging only in debug builds.
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
         }
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
@@ -30,7 +32,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://api.tvmaze.com/")
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
