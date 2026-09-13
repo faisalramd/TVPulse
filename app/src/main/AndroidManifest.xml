@@ -33,9 +33,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="tvpulse" android:host="home" />
-                <data android:scheme="tvpulse" android:host="favorite" />
-                <data android:scheme="tvpulse" android:host="detail" />
+                <data android:scheme="movieapp" android:host="home" />
+                <data android:scheme="movieapp" android:host="favorite" />
+                <data android:scheme="movieapp" android:host="detail" />
             </intent-filter>
         </activity>
 

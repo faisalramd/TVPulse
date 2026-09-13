@@ -5,7 +5,7 @@ package com.bookcabin.tvpulse.features.navigation
  * declared for MainActivity in the app manifest.
  */
 object DeepLinks {
-    const val SCHEME = "tvpulse"
+    const val SCHEME = "movieapp"
 
     const val HOST_HOME = "home"
     const val HOST_FAVORITE = "favorite"
