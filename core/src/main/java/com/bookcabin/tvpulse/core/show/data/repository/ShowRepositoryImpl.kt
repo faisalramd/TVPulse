@@ -22,4 +22,7 @@ class ShowRepositoryImpl @Inject constructor(
         val shows = showApi.getShows().toDomain(limitItems)
         showDao.insertShows(shows.map { it.toEntity() })
     }
+
+    override suspend fun searchShows(query: String): List<Show> =
+        showApi.searchShows(query).map { it.show.toDomain() }
 }

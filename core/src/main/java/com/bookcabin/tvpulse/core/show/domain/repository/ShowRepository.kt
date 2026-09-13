@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface ShowRepository {
     fun observeShows(): Flow<List<Show>>
     suspend fun refreshShows(limitItems: Int? = null)
+    suspend fun searchShows(query: String): List<Show>
 }

@@ -25,7 +25,10 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
             deepLinks = listOf(navDeepLink<Home>(basePath = DeepLinks.HOME))
         ) {
             val viewModel: HomeViewModel = hiltViewModel()
-            HomeScreen(viewModel = viewModel)
+            HomeScreen(
+                viewModel = viewModel,
+                onShowClick = { show -> navController.navigate(Detail(showId = show.id)) }
+            )
         }
         composable<Favorite>(
             deepLinks = listOf(navDeepLink<Favorite>(basePath = DeepLinks.FAVORITE))

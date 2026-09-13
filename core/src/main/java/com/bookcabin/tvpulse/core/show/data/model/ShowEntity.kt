@@ -7,5 +7,7 @@ import androidx.room.PrimaryKey
 data class ShowEntity(
     @PrimaryKey
     val id: Int,
-    val name: String
+    val name: String,
+    val imageUrl: String?,
+    val rating: Double?
 )

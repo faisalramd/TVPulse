@@ -23,7 +23,10 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "tvpulse_db"
-        ).build()
+        )
+            // The shows table is a network cache, so dropping it on schema changes is safe.
+            .fallbackToDestructiveMigration(dropAllTables = true)
+            .build()
     }
 
     @Provides
