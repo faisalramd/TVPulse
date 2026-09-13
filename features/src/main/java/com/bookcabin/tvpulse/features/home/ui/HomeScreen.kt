@@ -1,7 +1,6 @@
 package com.bookcabin.tvpulse.features.home.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,7 +16,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,10 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.bookcabin.tvpulse.core.show.domain.model.Show
+import com.bookcabin.tvpulse.features.common.components.EmptyState
 import com.bookcabin.tvpulse.features.common.components.ErrorDialog
 import com.bookcabin.tvpulse.features.home.state.HomeUiState
 import com.bookcabin.tvpulse.features.home.viewmodel.HomeViewModel
@@ -146,30 +144,6 @@ private fun ShowGridContent(
                 items(uiState.shows, key = { it.id }) { show ->
                     ShowCard(show = show, onClick = { onShowClick(show) })
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun EmptyState(message: String, onRetry: (() -> Unit)? = null) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center
-            )
-            if (onRetry != null) {
-                Button(onClick = onRetry) { Text("Retry") }
             }
         }
     }

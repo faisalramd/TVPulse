@@ -4,7 +4,7 @@ import com.bookcabin.tvpulse.core.show.domain.model.ShowDetail
 
 data class DetailUiState(
     val show: ShowDetail? = null,
+    val isFavorite: Boolean = false,
     val isLoading: Boolean = false,
-    // Shown in an error dialog until dismissed or retried.
     val errorMessage: String? = null
 )

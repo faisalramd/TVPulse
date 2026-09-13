@@ -21,6 +21,7 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -62,7 +63,11 @@ fun DetailScreen(
         val show = uiState.show
         when {
             uiState.isLoading -> DetailPlaceholder()
-            show != null -> DetailContent(show = show)
+            show != null -> DetailContent(
+                show = show,
+                isFavorite = uiState.isFavorite,
+                onFavoriteClick = viewModel::toggleFavorite
+            )
         }
     }
 
@@ -76,7 +81,7 @@ fun DetailScreen(
 }
 
 @Composable
-private fun DetailContent(show: ShowDetail) {
+private fun DetailContent(show: ShowDetail, isFavorite: Boolean, onFavoriteClick: () -> Unit) {
     Column(
         modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -109,9 +114,14 @@ private fun DetailContent(show: ShowDetail) {
             }
         }
 
-        // Favorites aren't implemented yet.
-        FilledTonalButton(onClick = {}, modifier = Modifier.fillMaxWidth()) {
-            Text("TAMBAH KE FAVORIT")
+        if (isFavorite) {
+            OutlinedButton(onClick = onFavoriteClick, modifier = Modifier.fillMaxWidth()) {
+                Text("HAPUS DARI FAVORIT")
+            }
+        } else {
+            FilledTonalButton(onClick = onFavoriteClick, modifier = Modifier.fillMaxWidth()) {
+                Text("TAMBAH KE FAVORIT")
+            }
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

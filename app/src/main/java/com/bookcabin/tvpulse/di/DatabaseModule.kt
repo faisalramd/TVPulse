@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.bookcabin.tvpulse.core.common.AppDatabase
 import com.bookcabin.tvpulse.core.common.SettingsDataStore
+import com.bookcabin.tvpulse.core.favorite.data.source.FavoriteDao
 import com.bookcabin.tvpulse.core.show.data.source.ShowDao
 import dagger.Module
 import dagger.Provides
@@ -24,7 +25,6 @@ object DatabaseModule {
             AppDatabase::class.java,
             "tvpulse_db"
         )
-            // The shows table is a network cache, so dropping it on schema changes is safe.
             .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
     }
@@ -32,6 +32,11 @@ object DatabaseModule {
     @Provides
     fun provideHomeDao(database: AppDatabase): ShowDao {
         return database.homeDao()
+    }
+
+    @Provides
+    fun provideFavoriteDao(database: AppDatabase): FavoriteDao {
+        return database.favoriteDao()
     }
 
     @Provides
