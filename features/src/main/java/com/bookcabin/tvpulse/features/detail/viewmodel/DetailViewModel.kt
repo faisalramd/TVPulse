@@ -3,7 +3,6 @@ package com.bookcabin.tvpulse.features.detail.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.bookcabin.tvpulse.core.favorite.domain.model.Favorite
 import com.bookcabin.tvpulse.core.favorite.domain.usecase.AddFavoriteUseCase
 import com.bookcabin.tvpulse.core.favorite.domain.usecase.IsFavoriteUseCase
@@ -34,7 +33,8 @@ class DetailViewModel @Inject constructor(
     private val removeFavoriteUseCase: RemoveFavoriteUseCase
 ) : ViewModel() {
 
-    private val showId = savedStateHandle.toRoute<Detail>().showId
+    // Read directly rather than via toRoute<Detail>(), so it'll be testable
+    private val showId: Int = checkNotNull(savedStateHandle[Detail.SHOW_ID_KEY])
 
     private val _uiState = MutableStateFlow(DetailUiState(isLoading = true))
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()

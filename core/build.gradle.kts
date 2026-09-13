@@ -39,4 +39,8 @@ dependencies {
     // Dependency Injection
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    // Test
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

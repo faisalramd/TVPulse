@@ -11,6 +11,10 @@ object Home : AppRoute
 object Favorite : AppRoute
 
 @Serializable
-data class Detail(val showId: Int) : AppRoute
+data class Detail(val showId: Int) : AppRoute {
+    companion object {
+        const val SHOW_ID_KEY = "showId"
+    }
+}
 
 
