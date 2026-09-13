@@ -32,7 +32,7 @@ class HomeViewModel @Inject constructor(
     fun refreshShows() {
         viewModelScope.launch {
             try {
-                refreshShowsUseCase()
+                refreshShowsUseCase(30)
                 Log.d("HomeViewModel", "Successfully refreshed shows.")
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "Error fetching shows", e)

@@ -18,8 +18,8 @@ class ShowRepositoryImpl @Inject constructor(
     override fun observeShows(): Flow<List<Show>> =
         showDao.getAllShows().map { entities -> entities.map { it.toDomain() } }
 
-    override suspend fun refreshShows() {
-        val shows = showApi.getShows().map { it.toDomain() }
+    override suspend fun refreshShows(limitItems: Int?) {
+        val shows = showApi.getShows().toDomain(limitItems)
         showDao.insertShows(shows.map { it.toEntity() })
     }
 }

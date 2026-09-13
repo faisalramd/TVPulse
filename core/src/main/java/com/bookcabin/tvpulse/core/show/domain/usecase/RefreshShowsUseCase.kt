@@ -6,5 +6,5 @@ import javax.inject.Inject
 class RefreshShowsUseCase @Inject constructor(
     private val showRepository: ShowRepository
 ) {
-    suspend operator fun invoke() = showRepository.refreshShows()
+    suspend operator fun invoke(limitItems: Int) = showRepository.refreshShows(limitItems)
 }
