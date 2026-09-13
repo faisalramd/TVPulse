@@ -42,6 +42,7 @@ import com.bookcabin.tvpulse.features.R
 import com.bookcabin.tvpulse.features.common.components.ErrorDialog
 import com.bookcabin.tvpulse.features.common.error.asString
 import com.bookcabin.tvpulse.features.common.components.shimmer
+import com.bookcabin.tvpulse.features.common.state.UiState
 import com.bookcabin.tvpulse.features.detail.viewmodel.DetailViewModel
 
 private const val IMAGE_ASPECT_RATIO = 16f / 10f
@@ -55,23 +56,27 @@ fun DetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
+    Column(modifier = modifier.fillMaxSize()) {
         IconButton(onClick = onBackClick, modifier = Modifier.padding(4.dp)) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.detail_back))
         }
 
-        val show = uiState.show
-        when {
-            uiState.isLoading -> DetailPlaceholder()
-            show != null -> DetailContent(
-                show = show,
-                isFavorite = uiState.isFavorite,
-                onFavoriteClick = viewModel::toggleFavorite
+        when (val detailState = uiState.detailState) {
+            UiState.Loading -> Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                DetailPlaceholder()
+            }
+            is UiState.Success -> Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                DetailContent(
+                    show = detailState.data,
+                    isFavorite = uiState.isFavorite,
+                    onFavoriteClick = viewModel::toggleFavorite
+                )
+            }
+            is UiState.Error -> DetailErrorState(
+                message = detailState.message.asString(),
+                onRetry = viewModel::retry
             )
+            UiState.Empty -> Unit
         }
     }
 

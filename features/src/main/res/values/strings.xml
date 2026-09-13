@@ -43,6 +43,7 @@
     <string name="detail_status_ended">Selesai</string>
     <string name="detail_status_to_be_determined">Belum Pasti</string>
     <string name="detail_status_in_development">Dalam Pengembangan</string>
+    <string name="detail_error_title">Gagal Memuat Detail</string>
 
     <!-- Favorite -->
     <string name="favorite_title">Favorit Saya</string>

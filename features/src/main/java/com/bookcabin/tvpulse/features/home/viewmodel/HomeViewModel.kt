@@ -2,11 +2,13 @@ package com.bookcabin.tvpulse.features.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bookcabin.tvpulse.core.show.domain.model.Show
 import com.bookcabin.tvpulse.core.show.domain.usecase.GetLocalShowsUseCase
 import com.bookcabin.tvpulse.core.show.domain.usecase.RefreshShowsUseCase
 import com.bookcabin.tvpulse.core.show.domain.usecase.SearchShowsUseCase
 import com.bookcabin.tvpulse.features.common.error.ErrorMessage
 import com.bookcabin.tvpulse.features.common.error.ErrorMessageMapper
+import com.bookcabin.tvpulse.features.common.state.UiState
 import com.bookcabin.tvpulse.features.home.constant.HomeConstants
 import com.bookcabin.tvpulse.features.home.state.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,9 +40,9 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val query = MutableStateFlow("")
-    private val isRefreshing = MutableStateFlow(false)
-    private val refreshFailed = MutableStateFlow(false)
-    private val searchState = MutableStateFlow(HomeUiState())
+    private val isRefreshing = MutableStateFlow(true)
+    private val refreshError = MutableStateFlow<ErrorMessage?>(null)
+    private val searchState = MutableStateFlow<UiState<List<Show>>>(UiState.Loading)
     private val errorMessage = MutableStateFlow<ErrorMessage?>(null)
     private var searchJob: Job? = null
 
@@ -52,7 +54,7 @@ class HomeViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    private val showsState: Flow<HomeUiState> = query
+    private val showsState: Flow<UiState<List<Show>>> = query
         .map { it.isBlank() }
         .distinctUntilChanged()
         .flatMapLatest { isBlank ->
@@ -63,15 +65,14 @@ class HomeViewModel @Inject constructor(
         query,
         showsState,
         errorMessage
-    ) { query, state, error ->
-        state.copy(query = query, errorMessage = error)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
-
+    ) { query, showsState, error ->
+        HomeUiState(query = query, showsState = showsState, errorMessage = error)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
 
     fun onQueryChange(newQuery: String) {
         query.value = newQuery
         searchJob?.cancel()
-        searchState.value = HomeUiState(isLoading = true)
+        searchState.value = UiState.Loading
     }
 
     fun retry() {
@@ -86,31 +87,32 @@ class HomeViewModel @Inject constructor(
     private fun refreshShows() {
         viewModelScope.launch {
             isRefreshing.value = true
-            refreshFailed.value = false
+            refreshError.value = null
             try {
                 refreshShowsUseCase(HomeConstants.SHOW_ITEMS_LIMIT)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                refreshFailed.value = true
-                errorMessage.value = ErrorMessageMapper.map(e)
+                val message = ErrorMessageMapper.map(e)
+                refreshError.value = message
+                errorMessage.value = message
             } finally {
                 isRefreshing.value = false
             }
         }
     }
 
-    // Cached shows are shown right away; the loading state only applies while the cache is empty.
-    private fun localShowsState(): Flow<HomeUiState> = combine(
+    private fun localShowsState(): Flow<UiState<List<Show>>> = combine(
         getLocalShowsUseCase(),
         isRefreshing,
-        refreshFailed
-    ) { shows, refreshing, failed ->
-        HomeUiState(
-            shows = shows,
-            isLoading = refreshing && shows.isEmpty(),
-            loadFailed = failed && shows.isEmpty()
-        )
+        refreshError
+    ) { shows, refreshing, error ->
+        when {
+            shows.isNotEmpty() -> UiState.Success(shows)
+            refreshing -> UiState.Loading
+            error != null -> UiState.Error(error)
+            else -> UiState.Empty
+        }
     }
 
     private fun search() {
@@ -119,14 +121,16 @@ class HomeViewModel @Inject constructor(
         if (query.isEmpty()) return
 
         searchJob = viewModelScope.launch {
-            searchState.value = HomeUiState(isLoading = true)
+            searchState.value = UiState.Loading
             try {
-                searchState.value = HomeUiState(shows = searchShowsUseCase(query))
+                val shows = searchShowsUseCase(query)
+                searchState.value = if (shows.isEmpty()) UiState.Empty else UiState.Success(shows)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                errorMessage.value = ErrorMessageMapper.map(e)
-                searchState.value = HomeUiState(loadFailed = true)
+                val message = ErrorMessageMapper.map(e)
+                errorMessage.value = message
+                searchState.value = UiState.Error(message)
             }
         }
     }

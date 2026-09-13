@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,6 +38,7 @@ import com.bookcabin.tvpulse.features.R
 import com.bookcabin.tvpulse.features.common.components.EmptyState
 import com.bookcabin.tvpulse.features.common.components.ErrorDialog
 import com.bookcabin.tvpulse.features.common.error.asString
+import com.bookcabin.tvpulse.features.common.state.UiState
 import com.bookcabin.tvpulse.features.home.constant.HomeConstants
 import com.bookcabin.tvpulse.features.home.state.HomeUiState
 import com.bookcabin.tvpulse.features.home.viewmodel.HomeViewModel
@@ -134,29 +136,35 @@ private fun ShowGridContent(
     onShowClick: (Show) -> Unit,
     onRetry: () -> Unit
 ) {
-    when {
-        uiState.loadFailed -> EmptyState(message = stringResource(R.string.home_load_failed), onRetry = onRetry)
+    when (val showsState = uiState.showsState) {
+        UiState.Loading -> ShowGrid {
+            items(PLACEHOLDER_COUNT) { ShowCardPlaceholder() }
+        }
 
-        !uiState.isLoading && uiState.shows.isEmpty() -> if (uiState.query.isBlank()) {
+        is UiState.Success -> ShowGrid {
+            items(showsState.data, key = { it.id }) { show ->
+                ShowCard(show = show, onClick = { onShowClick(show) })
+            }
+        }
+
+        is UiState.Error -> EmptyState(message = stringResource(R.string.home_load_failed), onRetry = onRetry)
+
+        UiState.Empty -> if (uiState.query.isBlank()) {
             EmptyState(message = stringResource(R.string.home_empty))
         } else {
             SearchNotFound(query = uiState.query)
         }
-
-        else -> LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            if (uiState.isLoading) {
-                items(PLACEHOLDER_COUNT) { ShowCardPlaceholder() }
-            } else {
-                items(uiState.shows, key = { it.id }) { show ->
-                    ShowCard(show = show, onClick = { onShowClick(show) })
-                }
-            }
-        }
     }
+}
+
+@Composable
+private fun ShowGrid(content: LazyGridScope.() -> Unit) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        content = content
+    )
 }

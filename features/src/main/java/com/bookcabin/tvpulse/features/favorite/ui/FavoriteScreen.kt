@@ -31,6 +31,8 @@ import coil.compose.AsyncImage
 import com.bookcabin.tvpulse.core.favorite.domain.model.Favorite
 import com.bookcabin.tvpulse.features.R
 import com.bookcabin.tvpulse.features.common.components.EmptyState
+import com.bookcabin.tvpulse.features.common.error.asString
+import com.bookcabin.tvpulse.features.common.state.UiState
 import com.bookcabin.tvpulse.features.favorite.viewmodel.FavoriteViewModel
 
 @Composable
@@ -55,22 +57,24 @@ fun FavoriteScreen(
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = stringResource(R.string.film_count, uiState.favorites.size),
+                text = stringResource(R.string.film_count, (uiState as? UiState.Success)?.data?.size ?: 0),
                 style = MaterialTheme.typography.bodyLarge
             )
         }
 
-        when {
-            uiState.isLoading -> Unit
+        when (val state = uiState) {
+            UiState.Loading -> Unit
 
-            uiState.favorites.isEmpty() -> EmptyState(message = stringResource(R.string.favorite_empty))
+            UiState.Empty -> EmptyState(message = stringResource(R.string.favorite_empty))
 
-            else -> LazyColumn(
+            is UiState.Error -> EmptyState(message = state.message.asString())
+
+            is UiState.Success -> LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(uiState.favorites, key = { it.id }) { favorite ->
+                items(state.data, key = { it.id }) { favorite ->
                     FavoriteItem(
                         favorite = favorite,
                         onClick = { onFavoriteClick(favorite) },

@@ -5,6 +5,7 @@ import com.bookcabin.tvpulse.core.show.domain.usecase.RefreshShowsUseCase
 import com.bookcabin.tvpulse.core.show.domain.usecase.SearchShowsUseCase
 import com.bookcabin.tvpulse.features.R
 import com.bookcabin.tvpulse.features.common.error.ErrorMessage
+import com.bookcabin.tvpulse.features.common.state.UiState
 import com.bookcabin.tvpulse.features.home.constant.HomeConstants
 import com.bookcabin.tvpulse.features.testutil.FakeShowRepository
 import com.bookcabin.tvpulse.features.testutil.MainDispatcherRule
@@ -13,6 +14,7 @@ import com.bookcabin.tvpulse.features.testutil.TestData.girls
 import com.bookcabin.tvpulse.features.testutil.TestData.personOfInterest
 import com.bookcabin.tvpulse.features.testutil.TestData.underTheDome
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -21,7 +23,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -36,6 +37,8 @@ class HomeViewModelTest {
 
     private val repository = FakeShowRepository()
 
+    private val noInternet = ErrorMessage(R.string.error_no_internet)
+
     private fun TestScope.createViewModel(): HomeViewModel {
         val viewModel = HomeViewModel(
             getLocalShowsUseCase = GetLocalShowsUseCase(repository),
@@ -48,41 +51,59 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `starts in loading state`() = runTest(mainDispatcherRule.testDispatcher) {
+    fun `starts in Loading state`() = runTest(mainDispatcherRule.testDispatcher) {
         val viewModel = createViewModel()
 
-        assertTrue(viewModel.uiState.value.isLoading)
+        assertEquals(UiState.Loading, viewModel.uiState.value.showsState)
     }
 
     @Test
-    fun `refresh loads the configured number of shows`() = runTest(mainDispatcherRule.testDispatcher) {
+    fun `stays Loading while the first refresh runs with an empty cache`() =
+        runTest(mainDispatcherRule.testDispatcher) {
+            repository.refreshResult = { awaitCancellation() }
+
+            val viewModel = createViewModel()
+            runCurrent()
+
+            assertEquals(UiState.Loading, viewModel.uiState.value.showsState)
+        }
+
+    @Test
+    fun `refresh loads the configured number of shows as Success`() = runTest(mainDispatcherRule.testDispatcher) {
         repository.refreshResult = { listOf(underTheDome, personOfInterest) }
 
         val viewModel = createViewModel()
         advanceUntilIdle()
 
-        val state = viewModel.uiState.value
         assertEquals(listOf<Int?>(HomeConstants.SHOW_ITEMS_LIMIT), repository.refreshLimits)
-        assertEquals(listOf(underTheDome, personOfInterest), state.shows)
-        assertFalse(state.isLoading)
-        assertFalse(state.loadFailed)
+        assertEquals(UiState.Success(listOf(underTheDome, personOfInterest)), viewModel.uiState.value.showsState)
     }
 
     @Test
-    fun `refresh failure with empty cache sets loadFailed and error`() = runTest(mainDispatcherRule.testDispatcher) {
-        repository.refreshResult = { throw UnknownHostException() }
+    fun `refresh with no shows gives Empty`() = runTest(mainDispatcherRule.testDispatcher) {
+        repository.refreshResult = { emptyList() }
 
         val viewModel = createViewModel()
         advanceUntilIdle()
 
-        val state = viewModel.uiState.value
-        assertTrue(state.loadFailed)
-        assertFalse(state.isLoading)
-        assertEquals(ErrorMessage(R.string.error_no_internet), state.errorMessage)
+        assertEquals(UiState.Empty, viewModel.uiState.value.showsState)
     }
 
     @Test
-    fun `refresh failure with cached shows keeps them and still reports the error`() =
+    fun `refresh failure with empty cache gives Error and shows the dialog`() =
+        runTest(mainDispatcherRule.testDispatcher) {
+            repository.refreshResult = { throw UnknownHostException() }
+
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            val state = viewModel.uiState.value
+            assertEquals(UiState.Error(noInternet), state.showsState)
+            assertEquals(noInternet, state.errorMessage)
+        }
+
+    @Test
+    fun `refresh failure with cached shows keeps Success and still shows the dialog`() =
         runTest(mainDispatcherRule.testDispatcher) {
             repository.localShows.value = listOf(underTheDome)
             repository.refreshResult = { throw UnknownHostException() }
@@ -91,9 +112,8 @@ class HomeViewModelTest {
             advanceUntilIdle()
 
             val state = viewModel.uiState.value
-            assertEquals(listOf(underTheDome), state.shows)
-            assertFalse(state.loadFailed)
-            assertEquals(ErrorMessage(R.string.error_no_internet), state.errorMessage)
+            assertEquals(UiState.Success(listOf(underTheDome)), state.showsState)
+            assertEquals(noInternet, state.errorMessage)
         }
 
     @Test
@@ -109,7 +129,7 @@ class HomeViewModelTest {
         runCurrent()
 
         assertTrue(repository.searchQueries.isEmpty())
-        assertTrue(viewModel.uiState.value.isLoading)
+        assertEquals(UiState.Loading, viewModel.uiState.value.showsState)
 
         advanceTimeBy(1)
         runCurrent()
@@ -118,7 +138,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `search results replace the list`() = runTest(mainDispatcherRule.testDispatcher) {
+    fun `search results are Success`() = runTest(mainDispatcherRule.testDispatcher) {
         repository.refreshResult = { listOf(underTheDome) }
         repository.searchResult = { listOf(girls) }
         val viewModel = createViewModel()
@@ -129,12 +149,11 @@ class HomeViewModelTest {
 
         val state = viewModel.uiState.value
         assertEquals("girls", state.query)
-        assertEquals(listOf(girls), state.shows)
-        assertFalse(state.isLoading)
+        assertEquals(UiState.Success(listOf(girls)), state.showsState)
     }
 
     @Test
-    fun `search with no results ends with an empty, loaded state`() = runTest(mainDispatcherRule.testDispatcher) {
+    fun `search with no results is Empty`() = runTest(mainDispatcherRule.testDispatcher) {
         repository.searchResult = { emptyList() }
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -143,25 +162,25 @@ class HomeViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertTrue(state.shows.isEmpty())
-        assertFalse(state.isLoading)
-        assertFalse(state.loadFailed)
+        assertEquals(UiState.Empty, state.showsState)
         assertNull(state.errorMessage)
     }
 
     @Test
-    fun `search failure sets loadFailed and mapped error`() = runTest(mainDispatcherRule.testDispatcher) {
-        repository.searchResult = { throw TestData.httpException(503) }
-        val viewModel = createViewModel()
-        advanceUntilIdle()
+    fun `search failure is Error with mapped message and shows the dialog`() =
+        runTest(mainDispatcherRule.testDispatcher) {
+            repository.searchResult = { throw TestData.httpException(503) }
+            val viewModel = createViewModel()
+            advanceUntilIdle()
 
-        viewModel.onQueryChange("girls")
-        advanceUntilIdle()
+            viewModel.onQueryChange("girls")
+            advanceUntilIdle()
 
-        val state = viewModel.uiState.value
-        assertTrue(state.loadFailed)
-        assertEquals(ErrorMessage(R.string.error_server, listOf(503)), state.errorMessage)
-    }
+            val serverError = ErrorMessage(R.string.error_server, listOf(503))
+            val state = viewModel.uiState.value
+            assertEquals(UiState.Error(serverError), state.showsState)
+            assertEquals(serverError, state.errorMessage)
+        }
 
     @Test
     fun `clearing the query shows the local list again`() = runTest(mainDispatcherRule.testDispatcher) {
@@ -177,7 +196,7 @@ class HomeViewModelTest {
 
         val state = viewModel.uiState.value
         assertEquals("", state.query)
-        assertEquals(listOf(underTheDome), state.shows)
+        assertEquals(UiState.Success(listOf(underTheDome)), state.showsState)
     }
 
     @Test
@@ -192,8 +211,7 @@ class HomeViewModelTest {
 
         val state = viewModel.uiState.value
         assertEquals(2, repository.refreshLimits.size)
-        assertEquals(listOf(underTheDome), state.shows)
-        assertFalse(state.loadFailed)
+        assertEquals(UiState.Success(listOf(underTheDome)), state.showsState)
         assertNull(state.errorMessage)
     }
 
@@ -212,12 +230,12 @@ class HomeViewModelTest {
 
             val state = viewModel.uiState.value
             assertEquals(listOf("girls", "girls"), repository.searchQueries)
-            assertEquals(listOf(girls), state.shows)
+            assertEquals(UiState.Success(listOf(girls)), state.showsState)
             assertNull(state.errorMessage)
         }
 
     @Test
-    fun `dismissError clears the error`() = runTest(mainDispatcherRule.testDispatcher) {
+    fun `dismissError hides the dialog but keeps the Error content`() = runTest(mainDispatcherRule.testDispatcher) {
         repository.refreshResult = { throw UnknownHostException() }
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -225,6 +243,8 @@ class HomeViewModelTest {
         viewModel.dismissError()
         advanceUntilIdle()
 
-        assertNull(viewModel.uiState.value.errorMessage)
+        val state = viewModel.uiState.value
+        assertNull(state.errorMessage)
+        assertEquals(UiState.Error(noInternet), state.showsState)
     }
 }

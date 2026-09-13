@@ -10,6 +10,7 @@ import com.bookcabin.tvpulse.core.favorite.domain.usecase.RemoveFavoriteUseCase
 import com.bookcabin.tvpulse.core.show.domain.model.ShowDetail
 import com.bookcabin.tvpulse.core.show.domain.usecase.GetShowDetailUseCase
 import com.bookcabin.tvpulse.features.common.error.ErrorMessageMapper
+import com.bookcabin.tvpulse.features.common.state.UiState
 import com.bookcabin.tvpulse.features.detail.state.DetailUiState
 import com.bookcabin.tvpulse.features.navigation.Detail
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,7 +37,7 @@ class DetailViewModel @Inject constructor(
     // Read directly rather than via toRoute<Detail>(), so it'll be testable
     private val showId: Int = checkNotNull(savedStateHandle[Detail.SHOW_ID_KEY])
 
-    private val _uiState = MutableStateFlow(DetailUiState(isLoading = true))
+    private val _uiState = MutableStateFlow(DetailUiState())
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
 
     private var loadJob: Job? = null
@@ -58,7 +59,7 @@ class DetailViewModel @Inject constructor(
 
     fun toggleFavorite() {
         val state = _uiState.value
-        val show = state.show ?: return
+        val show = (state.detailState as? UiState.Success)?.data ?: return
         viewModelScope.launch {
             if (state.isFavorite) removeFavoriteUseCase(show.id) else addFavoriteUseCase(show.toFavorite())
         }
@@ -67,14 +68,15 @@ class DetailViewModel @Inject constructor(
     private fun loadShowDetail() {
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update { it.copy(detailState = UiState.Loading, errorMessage = null) }
             try {
                 val show = getShowDetailUseCase(showId)
-                _uiState.update { it.copy(show = show, isLoading = false) }
+                _uiState.update { it.copy(detailState = UiState.Success(show)) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = ErrorMessageMapper.map(e)) }
+                val message = ErrorMessageMapper.map(e)
+                _uiState.update { it.copy(detailState = UiState.Error(message), errorMessage = message) }
             }
         }
     }

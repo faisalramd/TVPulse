@@ -7,6 +7,7 @@ import com.bookcabin.tvpulse.core.favorite.domain.usecase.RemoveFavoriteUseCase
 import com.bookcabin.tvpulse.core.show.domain.usecase.GetShowDetailUseCase
 import com.bookcabin.tvpulse.features.R
 import com.bookcabin.tvpulse.features.common.error.ErrorMessage
+import com.bookcabin.tvpulse.features.common.state.UiState
 import com.bookcabin.tvpulse.features.navigation.Detail
 import com.bookcabin.tvpulse.features.testutil.FakeFavoriteRepository
 import com.bookcabin.tvpulse.features.testutil.FakeShowRepository
@@ -43,13 +44,12 @@ class DetailViewModelTest {
     )
 
     @Test
-    fun `starts in loading state`() {
+    fun `starts in Loading state`() {
         showRepository.detailResult = { strangerThings }
 
         val state = createViewModel().uiState.value
 
-        assertTrue(state.isLoading)
-        assertNull(state.show)
+        assertEquals(UiState.Loading, state.detailState)
     }
 
     @Test
@@ -61,8 +61,7 @@ class DetailViewModelTest {
 
         val state = viewModel.uiState.value
         assertEquals(listOf(2993), showRepository.requestedDetailIds)
-        assertEquals(strangerThings, state.show)
-        assertFalse(state.isLoading)
+        assertEquals(UiState.Success(strangerThings), state.detailState)
         assertNull(state.errorMessage)
     }
 
@@ -73,10 +72,10 @@ class DetailViewModelTest {
         val viewModel = createViewModel()
         advanceUntilIdle()
 
+        val noInternet = ErrorMessage(R.string.error_no_internet)
         val state = viewModel.uiState.value
-        assertFalse(state.isLoading)
-        assertNull(state.show)
-        assertEquals(ErrorMessage(R.string.error_no_internet), state.errorMessage)
+        assertEquals(UiState.Error(noInternet), state.detailState)
+        assertEquals(noInternet, state.errorMessage)
     }
 
     @Test
@@ -100,7 +99,7 @@ class DetailViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertEquals(strangerThings, state.show)
+        assertEquals(UiState.Success(strangerThings), state.detailState)
         assertNull(state.errorMessage)
         assertEquals(2, showRepository.requestedDetailIds.size)
     }
@@ -115,6 +114,7 @@ class DetailViewModelTest {
         advanceUntilIdle()
 
         assertNull(viewModel.uiState.value.errorMessage)
+        assertTrue(viewModel.uiState.value.detailState is UiState.Error)
         assertEquals(1, showRepository.requestedDetailIds.size)
     }
 
