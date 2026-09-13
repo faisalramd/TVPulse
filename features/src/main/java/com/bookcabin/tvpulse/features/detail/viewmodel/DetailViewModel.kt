@@ -10,6 +10,7 @@ import com.bookcabin.tvpulse.core.favorite.domain.usecase.IsFavoriteUseCase
 import com.bookcabin.tvpulse.core.favorite.domain.usecase.RemoveFavoriteUseCase
 import com.bookcabin.tvpulse.core.show.domain.model.ShowDetail
 import com.bookcabin.tvpulse.core.show.domain.usecase.GetShowDetailUseCase
+import com.bookcabin.tvpulse.features.R
 import com.bookcabin.tvpulse.features.detail.state.DetailUiState
 import com.bookcabin.tvpulse.features.navigation.Detail
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,7 +53,7 @@ class DetailViewModel @Inject constructor(
     }
 
     fun dismissError() {
-        _uiState.update { it.copy(errorMessage = null) }
+        _uiState.update { it.copy(errorMessageRes = null) }
     }
 
     fun toggleFavorite() {
@@ -66,14 +67,14 @@ class DetailViewModel @Inject constructor(
     private fun loadShowDetail() {
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update { it.copy(isLoading = true, errorMessageRes = null) }
             try {
                 val show = getShowDetailUseCase(showId)
                 _uiState.update { it.copy(show = show, isLoading = false) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = "terjadi kesalahan") }
+                _uiState.update { it.copy(isLoading = false, errorMessageRes = R.string.error_generic_message) }
             }
         }
     }

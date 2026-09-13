@@ -1,0 +1,40 @@
+<resources>
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_favorite">Favorite</string>
+
+    <!-- Common -->
+    <string name="film_count">(%1$d Film)</string>
+    <string name="error_generic_message">Terjadi kesalahan</string>
+    <string name="error_dialog_title">Terjadi Kesalahan</string>
+    <string name="error_dialog_retry">Coba lagi</string>
+    <string name="error_dialog_dismiss">Tutup</string>
+    <string name="empty_state_retry">Coba Lagi</string>
+
+    <!-- Home -->
+    <string name="home_title_popular">Daftar Acara Populer</string>
+    <string name="home_title_search">Daftar Utama</string>
+    <string name="home_search_placeholder">Cari serial TV (misal: horror)...</string>
+    <string name="home_search_clear">Hapus pencarian</string>
+    <string name="home_load_failed">Gagal memuat data!</string>
+    <string name="home_empty">Tidak ada data!</string>
+    <string name="home_search_empty">Pencarian tidak ditemukan untuk \"%1$s\".</string>
+    <string name="show_rating_unavailable">N/A</string>
+
+    <!-- Detail -->
+    <string name="detail_back">Kembali</string>
+    <string name="detail_runtime_minutes">%1$d min</string>
+    <string name="detail_add_favorite">TAMBAH KE FAVORIT</string>
+    <string name="detail_remove_favorite">HAPUS DARI FAVORIT</string>
+    <string name="detail_synopsis">Sinopsis</string>
+    <string name="detail_synopsis_unavailable">Sinopsis belum tersedia.</string>
+    <string name="detail_status_running">Berjalan</string>
+    <string name="detail_status_ended">Selesai</string>
+    <string name="detail_status_to_be_determined">Belum Pasti</string>
+    <string name="detail_status_in_development">Dalam Pengembangan</string>
+
+    <!-- Favorite -->
+    <string name="favorite_title">Favorit Saya</string>
+    <string name="favorite_empty">Belum ada favorit.</string>
+    <string name="favorite_remove">HAPUS</string>
+</resources>

@@ -86,7 +86,7 @@ class MainActivity : ComponentActivity() {
                                         },
                                         text = {
                                             Text(
-                                                text = topLevelRoute.label.uppercase(),
+                                                text = stringResource(topLevelRoute.labelRes).uppercase(),
                                                 style = MaterialTheme.typography.titleSmall,
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(vertical = 4.dp)

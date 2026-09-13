@@ -1,5 +1,6 @@
 package com.bookcabin.tvpulse.features.detail.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,12 +31,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.bookcabin.tvpulse.core.show.domain.model.ShowDetail
+import com.bookcabin.tvpulse.features.R
 import com.bookcabin.tvpulse.features.common.components.ErrorDialog
 import com.bookcabin.tvpulse.features.common.components.shimmer
 import com.bookcabin.tvpulse.features.detail.viewmodel.DetailViewModel
@@ -57,7 +60,7 @@ fun DetailScreen(
             .verticalScroll(rememberScrollState())
     ) {
         IconButton(onClick = onBackClick, modifier = Modifier.padding(4.dp)) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.detail_back))
         }
 
         val show = uiState.show
@@ -71,9 +74,9 @@ fun DetailScreen(
         }
     }
 
-    uiState.errorMessage?.let { message ->
+    uiState.errorMessageRes?.let { messageRes ->
         ErrorDialog(
-            message = message,
+            message = stringResource(messageRes),
             onRetry = viewModel::retry,
             onDismiss = viewModel::dismissError
         )
@@ -103,8 +106,11 @@ private fun DetailContent(show: ShowDetail, isFavorite: Boolean, onFavoriteClick
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         )
 
-        val tags = show.genres +
-            listOfNotNull(show.runtimeMinutes?.let { "$it min" }, show.status?.toStatusLabel())
+        val runtimeLabel = show.runtimeMinutes?.let { stringResource(R.string.detail_runtime_minutes, it) }
+        val statusLabel = show.status?.let { status ->
+            statusLabelRes(status)?.let { stringResource(it) } ?: status
+        }
+        val tags = show.genres + listOfNotNull(runtimeLabel, statusLabel)
         if (tags.isNotEmpty()) {
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -116,23 +122,23 @@ private fun DetailContent(show: ShowDetail, isFavorite: Boolean, onFavoriteClick
 
         if (isFavorite) {
             OutlinedButton(onClick = onFavoriteClick, modifier = Modifier.fillMaxWidth()) {
-                Text("HAPUS DARI FAVORIT")
+                Text(stringResource(R.string.detail_remove_favorite))
             }
         } else {
             FilledTonalButton(onClick = onFavoriteClick, modifier = Modifier.fillMaxWidth()) {
-                Text("TAMBAH KE FAVORIT")
+                Text(stringResource(R.string.detail_add_favorite))
             }
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                text = "Sinopsis",
+                text = stringResource(R.string.detail_synopsis),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = show.summary?.let { AnnotatedString.fromHtml(it.trim()) }
-                    ?: AnnotatedString("Sinopsis belum tersedia."),
+                    ?: AnnotatedString(stringResource(R.string.detail_synopsis_unavailable)),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -205,10 +211,12 @@ private fun DetailPlaceholder() {
     }
 }
 
-private fun String.toStatusLabel(): String = when (this) {
-    "Running" -> "Berjalan"
-    "Ended" -> "Selesai"
-    "To Be Determined" -> "Belum Pasti"
-    "In Development" -> "Dalam Pengembangan"
-    else -> this
+// Maps TVMaze status values to a localized label; null for unknown statuses, which are shown as-is.
+@StringRes
+private fun statusLabelRes(status: String): Int? = when (status) {
+    "Running" -> R.string.detail_status_running
+    "Ended" -> R.string.detail_status_ended
+    "To Be Determined" -> R.string.detail_status_to_be_determined
+    "In Development" -> R.string.detail_status_in_development
+    else -> null
 }

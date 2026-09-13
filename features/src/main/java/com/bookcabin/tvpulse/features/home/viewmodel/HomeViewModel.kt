@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.bookcabin.tvpulse.core.show.domain.usecase.GetLocalShowsUseCase
 import com.bookcabin.tvpulse.core.show.domain.usecase.RefreshShowsUseCase
 import com.bookcabin.tvpulse.core.show.domain.usecase.SearchShowsUseCase
+import com.bookcabin.tvpulse.features.R
 import com.bookcabin.tvpulse.features.home.constant.HomeConstants
 import com.bookcabin.tvpulse.features.home.state.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,7 +40,7 @@ class HomeViewModel @Inject constructor(
     private val isRefreshing = MutableStateFlow(false)
     private val refreshFailed = MutableStateFlow(false)
     private val searchState = MutableStateFlow(HomeUiState())
-    private val errorMessage = MutableStateFlow<String?>(null)
+    private val errorMessageRes = MutableStateFlow<Int?>(null)
     private var searchJob: Job? = null
 
     init {
@@ -60,9 +61,9 @@ class HomeViewModel @Inject constructor(
     val uiState: StateFlow<HomeUiState> = combine(
         query,
         showsState,
-        errorMessage
+        errorMessageRes
     ) { query, state, error ->
-        state.copy(query = query, errorMessage = error)
+        state.copy(query = query, errorMessageRes = error)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
 
 
@@ -73,12 +74,12 @@ class HomeViewModel @Inject constructor(
     }
 
     fun retry() {
-        errorMessage.value = null
+        errorMessageRes.value = null
         if (query.value.isBlank()) refreshShows() else search()
     }
 
     fun dismissError() {
-        errorMessage.value = null
+        errorMessageRes.value = null
     }
 
     private fun refreshShows() {
@@ -91,7 +92,7 @@ class HomeViewModel @Inject constructor(
                 throw e
             } catch (e: Exception) {
                 refreshFailed.value = true
-                errorMessage.value = "terjadi kesalahan"
+                errorMessageRes.value = R.string.error_generic_message
             } finally {
                 isRefreshing.value = false
             }
@@ -123,7 +124,7 @@ class HomeViewModel @Inject constructor(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                errorMessage.value = "terjadi kesalahan"
+                errorMessageRes.value = R.string.error_generic_message
                 searchState.value = HomeUiState(loadFailed = true)
             }
         }

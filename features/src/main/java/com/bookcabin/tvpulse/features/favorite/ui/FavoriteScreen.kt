@@ -23,11 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.bookcabin.tvpulse.core.favorite.domain.model.Favorite
+import com.bookcabin.tvpulse.features.R
 import com.bookcabin.tvpulse.features.common.components.EmptyState
 import com.bookcabin.tvpulse.features.favorite.viewmodel.FavoriteViewModel
 
@@ -48,12 +50,12 @@ fun FavoriteScreen(
                 .padding(start = 16.dp, top = 16.dp, end = 16.dp)
         ) {
             Text(
-                text = "Favorit Saya",
+                text = stringResource(R.string.favorite_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "(${uiState.favorites.size} Film)",
+                text = stringResource(R.string.film_count, uiState.favorites.size),
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -61,7 +63,7 @@ fun FavoriteScreen(
         when {
             uiState.isLoading -> Unit
 
-            uiState.favorites.isEmpty() -> EmptyState(message = "Belum ada favorit.")
+            uiState.favorites.isEmpty() -> EmptyState(message = stringResource(R.string.favorite_empty))
 
             else -> LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -118,7 +120,7 @@ private fun FavoriteItem(favorite: Favorite, onClick: () -> Unit, onRemoveClick:
             }
             TextButton(onClick = onRemoveClick) {
                 Text(
-                    text = "HAPUS",
+                    text = stringResource(R.string.favorite_remove),
                     color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.Bold
                 )

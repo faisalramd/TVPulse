@@ -1,9 +1,12 @@
 package com.bookcabin.tvpulse.features.navigation
 
+import androidx.annotation.StringRes
+import com.bookcabin.tvpulse.features.R
+
 enum class AppDestinations(
-    val label: String,
+    @StringRes val labelRes: Int,
     val route: AppRoute
 ) {
-    HOME("Home", Home),
-    FAVORITE("Favorite", Favorite)
+    HOME(R.string.nav_home, Home),
+    FAVORITE(R.string.nav_favorite, Favorite)
 }

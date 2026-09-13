@@ -27,11 +27,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.bookcabin.tvpulse.core.show.domain.model.Show
+import com.bookcabin.tvpulse.features.R
 import com.bookcabin.tvpulse.features.common.components.EmptyState
 import com.bookcabin.tvpulse.features.common.components.ErrorDialog
 import com.bookcabin.tvpulse.features.home.constant.HomeConstants
@@ -64,14 +66,18 @@ fun HomeScreen(
                 .padding(start = 16.dp, top = 16.dp, end = 16.dp)
         ) {
             Text(
-                text = (if (uiState.query.isBlank()) "Daftar Acara Populer".uppercase() else "Daftar Utama"),
+                text = if (uiState.query.isBlank()) {
+                    stringResource(R.string.home_title_popular).uppercase()
+                } else {
+                    stringResource(R.string.home_title_search)
+                },
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = "(${HomeConstants.SHOW_ITEMS_LIMIT} Film)",
+                text = stringResource(R.string.film_count, HomeConstants.SHOW_ITEMS_LIMIT),
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -84,9 +90,9 @@ fun HomeScreen(
         )
     }
 
-    uiState.errorMessage?.let { message ->
+    uiState.errorMessageRes?.let { messageRes ->
         ErrorDialog(
-            message = message,
+            message = stringResource(messageRes),
             onRetry = viewModel::retry,
             onDismiss = viewModel::dismissError
         )
@@ -105,12 +111,12 @@ private fun ShowSearchBar(
         value = query,
         onValueChange = onQueryChange,
         modifier = modifier,
-        placeholder = { Text("Cari serial TV (misal: horror)...") },
+        placeholder = { Text(stringResource(R.string.home_search_placeholder)) },
         leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
         trailingIcon = {
             if (query.isNotEmpty()) {
                 IconButton(onClick = { onQueryChange("") }) {
-                    Icon(Icons.Filled.Clear, contentDescription = "Clear search")
+                    Icon(Icons.Filled.Clear, contentDescription = stringResource(R.string.home_search_clear))
                 }
             }
         },
@@ -128,10 +134,14 @@ private fun ShowGridContent(
     onRetry: () -> Unit
 ) {
     when {
-        uiState.loadFailed -> EmptyState(message = "Couldn't load shows.", onRetry = onRetry)
+        uiState.loadFailed -> EmptyState(message = stringResource(R.string.home_load_failed), onRetry = onRetry)
 
         !uiState.isLoading && uiState.shows.isEmpty() -> EmptyState(
-            message = if (uiState.query.isBlank()) "No shows yet." else "No shows found for \"${uiState.query}\"."
+            message = if (uiState.query.isBlank()) {
+                stringResource(R.string.home_empty)
+            } else {
+                stringResource(R.string.home_search_empty, uiState.query)
+            }
         )
 
         else -> LazyVerticalGrid(
