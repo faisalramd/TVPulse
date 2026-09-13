@@ -6,6 +6,16 @@
     <!-- Common -->
     <string name="film_count">(%1$d Film)</string>
     <string name="error_generic_message">Terjadi kesalahan</string>
+    <string name="error_no_internet">Tidak ada koneksi internet. Periksa jaringan Anda lalu coba lagi.</string>
+    <string name="error_timeout">Koneksi ke server terlalu lama. Silakan coba lagi.</string>
+    <string name="error_network">Gagal terhubung ke server. Silakan coba lagi.</string>
+    <string name="error_invalid_data">Data dari server tidak valid.</string>
+    <string name="error_local_data">Gagal mengakses data lokal.</string>
+    <string name="error_access_denied">Akses ditolak oleh server.</string>
+    <string name="error_not_found">Data tidak ditemukan.</string>
+    <string name="error_too_many_requests">Terlalu banyak permintaan. Tunggu sebentar lalu coba lagi.</string>
+    <string name="error_server">Server sedang bermasalah (kode %1$d). Silakan coba lagi nanti.</string>
+    <string name="error_http">Permintaan gagal (kode %1$d).</string>
     <string name="error_dialog_title">Terjadi Kesalahan</string>
     <string name="error_dialog_retry">Coba lagi</string>
     <string name="error_dialog_dismiss">Tutup</string>

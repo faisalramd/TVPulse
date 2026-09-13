@@ -40,6 +40,7 @@ import coil.compose.AsyncImage
 import com.bookcabin.tvpulse.core.show.domain.model.ShowDetail
 import com.bookcabin.tvpulse.features.R
 import com.bookcabin.tvpulse.features.common.components.ErrorDialog
+import com.bookcabin.tvpulse.features.common.error.asString
 import com.bookcabin.tvpulse.features.common.components.shimmer
 import com.bookcabin.tvpulse.features.detail.viewmodel.DetailViewModel
 
@@ -74,9 +75,9 @@ fun DetailScreen(
         }
     }
 
-    uiState.errorMessageRes?.let { messageRes ->
+    uiState.errorMessage?.let { errorMessage ->
         ErrorDialog(
-            message = stringResource(messageRes),
+            message = errorMessage.asString(),
             onRetry = viewModel::retry,
             onDismiss = viewModel::dismissError
         )

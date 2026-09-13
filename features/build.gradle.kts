@@ -50,4 +50,7 @@ dependencies {
 
     // Debug
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    // Test
+    testImplementation(libs.junit)
 }
