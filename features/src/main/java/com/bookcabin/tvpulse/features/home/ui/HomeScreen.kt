@@ -1,4 +1,4 @@
-package com.bookcabin.tvpulse.features.home.presentation.ui
+package com.bookcabin.tvpulse.features.home.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,8 +17,7 @@ import coil.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.bookcabin.tvpulse.features.home.presentation.state.HomeIntent
-import com.bookcabin.tvpulse.features.home.presentation.viewmodel.HomeViewModel
+import com.bookcabin.tvpulse.features.home.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier = Modifier) {
@@ -34,12 +33,12 @@ fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier = Modifier) {
         Text("Debug UI")
 
         // 1. DataStore Toggle
-        Button(onClick = { viewModel.onIntent(HomeIntent.ToggleFirstLaunch) }) {
+        Button(onClick = { viewModel.toggleFirstLaunch() }) {
             Text(text = "Is First Launch (DataStore): ${uiState.isFirstLaunch}")
         }
 
         // 2. Room Database Fetch
-        Button(onClick = { viewModel.onIntent(HomeIntent.FetchShows) }) {
+        Button(onClick = { viewModel.refreshShows() }) {
             Text("Fetch API & Save to DB")
         }
         Text("Local Shows Count (Room): ${uiState.shows.size}")

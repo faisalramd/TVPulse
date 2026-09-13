@@ -10,4 +10,7 @@ object Home : AppRoute
 @Serializable
 object Favorite : AppRoute
 
+@Serializable
+data class Detail(val showId: Int) : AppRoute
+
 

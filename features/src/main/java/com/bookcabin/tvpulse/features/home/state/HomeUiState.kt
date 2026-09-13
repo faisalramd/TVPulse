@@ -1,4 +1,4 @@
-package com.bookcabin.tvpulse.features.home.presentation.state
+package com.bookcabin.tvpulse.features.home.state
 
 import com.bookcabin.tvpulse.core.show.domain.model.Show
 

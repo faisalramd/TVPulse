@@ -1,4 +1,4 @@
-package com.bookcabin.tvpulse.features.home.presentation.viewmodel
+package com.bookcabin.tvpulse.features.home.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -6,8 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.bookcabin.tvpulse.core.common.SettingsDataStore
 import com.bookcabin.tvpulse.core.show.domain.usecase.GetLocalShowsUseCase
 import com.bookcabin.tvpulse.core.show.domain.usecase.RefreshShowsUseCase
-import com.bookcabin.tvpulse.features.home.presentation.state.HomeIntent
-import com.bookcabin.tvpulse.features.home.presentation.state.HomeUiState
+import com.bookcabin.tvpulse.features.home.state.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -30,14 +29,7 @@ class HomeViewModel @Inject constructor(
         HomeUiState(isFirstLaunch = isFirstLaunch, shows = shows)
     }.stateIn(viewModelScope, SharingStarted.Lazily, HomeUiState())
 
-    fun onIntent(intent: HomeIntent) {
-        when (intent) {
-            HomeIntent.ToggleFirstLaunch -> toggleFirstLaunch()
-            HomeIntent.FetchShows -> fetchShows()
-        }
-    }
-
-    private fun fetchShows() {
+    fun refreshShows() {
         viewModelScope.launch {
             try {
                 refreshShowsUseCase()
@@ -48,7 +40,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun toggleFirstLaunch() {
+    fun toggleFirstLaunch() {
         viewModelScope.launch {
             val current = uiState.value.isFirstLaunch
             settingsDataStore.setFirstLaunch(!current)
